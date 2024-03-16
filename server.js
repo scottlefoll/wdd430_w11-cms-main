@@ -5,6 +5,7 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 var mongoose = require('mongoose');
 
 // import the routing file to handle the default (index) route
@@ -15,22 +16,45 @@ const documentRoutes = require('./server/routes/documents');
 // const authenticationRoutes = require('./server/routes/authentication');
 
 const dotEnv = require('dotenv').config();
-const dbURL = process.env.DATABASE_URL;
+const uri = process.env.DB_URL;
 
 // ... ADD CODE TO IMPORT YOUR ROUTING FILES HERE ...
 var app = express(); // create an instance of express
 
 
 // establish a connection to the mongoDb database
-mongoose.connect(dbURL)
-  .then(() => {
-    console.log('Connected to database!');
-  })
-  .catch((err) => {
-    console.log('Connection failed: ' + err);
+// mongoose.connect(dbURL)
+//   .then(() => {
+//     console.log('Connected to database!');
+//   })
+//   .catch((err) => {
+//     console.log('Connection failed: ' + err);
+// });
+
+// const dbConn = mongoose.connection;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
 
-const dbConn = mongoose.connection;
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
 
 // Must be the first middleware loaded in order to log results from other middleware
 app.use(logger('dev')); // Tell express to use the Morgan logger
@@ -94,6 +118,7 @@ app.get('*', (req, res) => {
 
 // Define the port address and tell express to use this port
 const port = process.env.PORT || '3000';
+
 app.set('port', port);
 
 // Create HTTP server.

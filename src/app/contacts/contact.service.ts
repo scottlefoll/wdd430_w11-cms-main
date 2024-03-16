@@ -5,6 +5,7 @@ import { catchError, tap } from "rxjs";
 
 import { Contact } from "./contact.model";
 import { MessageService } from "../messages/message.service";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -50,22 +51,21 @@ export class ContactService{
   }
 
   getContacts() {
-    // From Database:
-    // this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json')
-    //   .subscribe(
-    //     (contacts: Contact[]) => {
-    //       this.contacts.length = 0;
-    //       this.contacts = contacts;
-    //       // this.contacts = this.sortContacts(contacts);
-    //       this.maxContactId = this.getMaxId();
-    //       // this.contacts.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
-    //       this.contacts.sort((a, b) => a.name.localeCompare(b.name));
-    //       this.contactListChangedEvent.next(this.contacts.slice());
-    //     },
-    //     (error: any) => {
-    //       console.error(error);
-    //     }
-    //   );
+    this.http.get(`${environment.apiUrl}/contacts`)
+      .subscribe(
+        (contacts: Contact[]) => {
+          this.contacts.length = 0;
+          this.contacts = contacts;
+          // this.contacts = this.sortContacts(contacts);
+          this.maxContactId = this.getMaxId();
+          // this.contacts.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
+          this.contacts.sort((a, b) => a.name.localeCompare(b.name));
+          this.contactListChangedEvent.next(this.contacts.slice());
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
   }
 
   getContact(id: string): Contact{
@@ -140,10 +140,10 @@ export class ContactService{
     let contacts = JSON.stringify(this.contacts);
     let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    // this.http.put('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json', contacts, {headers: headers})
-    //   .subscribe(response => {
-    //     this.contactListChangedEvent.next(this.contacts.slice());
-    //   });
+    this.http.put(`${environment.apiUrl}/contacts`, contacts, {headers: headers})
+      .subscribe(response => {
+        this.contactListChangedEvent.next(this.contacts.slice());
+      });
   }
 
   getMaxId(): number {

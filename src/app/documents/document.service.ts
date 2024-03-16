@@ -3,6 +3,7 @@ import { Subject, of } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 import { Document } from "./document.model";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,29 +34,20 @@ export class DocumentService{
     this.storeDocuments();
   }
 
-  // Call the HTTP service’s get() method to make an HTTP Get request to
-  // get the array of documents from your Firebase database server. It returns
-  // an Observable object because all HTTP requests are asynchronous (i.e. the
-  // response will not be returned immediately). This Observable object waits
-  // and listens for a response to be returned from the server.
   getDocuments() {
-    // From Firebase:
-    // this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/documents.json')
-    // From Express Server on Vercel (from MongoDB):
-
-    // this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/documents.json')
-    //   .subscribe(
-    //     (documents: Document[]) => {
-    //       this.documents = documents;
-    //       this.maxDocumentId = this.getMaxId();
-    //       // this.documents.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
-    //       this.documents.sort((a, b) => a.name.localeCompare(b.name));
-    //       this.documentListChangedEvent.next(this.documents.slice());
-    //     },
-    //     (error: any) => {
-    //       console.error(error);
-    //     }
-    //   );
+    this.http.get(`${environment.apiUrl}/documents`)
+      .subscribe(
+        (documents: Document[]) => {
+          this.documents = documents;
+          this.maxDocumentId = this.getMaxId();
+          // this.documents.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
+          this.documents.sort((a, b) => a.name.localeCompare(b.name));
+          this.documentListChangedEvent.next(this.documents.slice());
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
   }
 
   getDocument(id: string): Document{
@@ -125,10 +117,10 @@ export class DocumentService{
     let headers = new HttpHeaders({'Content-Type': 'application/json'
     });
 
-    // this.http.put('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/documents.json', documents, {headers: headers})
-    //   .subscribe(response => {
-    //     this.documentListChangedEvent.next(this.documents.slice());
-    //   });
+    this.http.put(`${environment.apiUrl}/documents`, documents, {headers: headers})
+      .subscribe(response => {
+        this.documentListChangedEvent.next(this.documents.slice());
+      });
   }
 
   getMaxId(): number {

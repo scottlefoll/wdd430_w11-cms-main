@@ -3,6 +3,7 @@ import { Subject, of } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 import { Message } from "./message.model";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -32,19 +33,18 @@ export class MessageService{
   }
 
   getMessages() {
-    // From Database:
-    // this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/messages.json')
-    //   .subscribe(
-    //     (messages: Message[]) => {
-    //       this.messages = messages;
-    //       this.maxMessageId = this.getMaxId();
-    //       this.messages.sort((a, b) => a.id.localeCompare(b.id));
-    //       this.messageListChangedEvent.next(this.messages.slice());
-    //     },
-    //     (error: any) => {
-    //       console.error(error);
-    //     }
-    //   );
+    this.http.get(`${environment.apiUrl}/messages`)
+      .subscribe(
+        (messages: Message[]) => {
+          this.messages = messages;
+          this.maxMessageId = this.getMaxId();
+          this.messages.sort((a, b) => a.id.localeCompare(b.id));
+          this.messageListChangedEvent.next(this.messages.slice());
+        },
+        (error: any) => {
+          console.error(error);
+        }
+      );
   }
 
   getMessage(id: string): Message{
@@ -122,10 +122,10 @@ export class MessageService{
     let messages = JSON.stringify(this.messages);
     let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    // this.http.put('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/messages.json', messages, {headers: headers})
-    //   .subscribe(response => {
-    //     this.messageListChangedEvent.next(this.messages.slice());
-    //   });
+    this.http.put(`${environment.apiUrl}/messages`, messages, {headers: headers})
+      .subscribe(response => {
+        this.messageListChangedEvent.next(this.messages.slice());
+      });
   }
 
   getMaxId(): number {
