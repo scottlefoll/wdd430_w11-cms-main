@@ -23,59 +23,59 @@ export class ContactService{
   // The HttpClient object will be used to send HTTP requests to the server.
   constructor(private http: HttpClient, private messageService: MessageService) {}
 
-  addContact(newContact: Contact){
-    if(!newContact){
-      return;
-    }
+  // addContact(newContact: Contact){
+  //   if(!newContact){
+  //     return;
+  //   }
 
-    this.maxContactId = this.getMaxId();
-    newContact.id = String(this.maxContactId + 1);
+  //   this.maxContactId = this.getMaxId();
+  //   newContact.id = String(this.maxContactId + 1);
 
-    if (newContact.group) {
-      newContact.group.forEach(contact => {
-        if (!contact.group) {
-          contact.group = [];
-        }
-        // check if the contact is already in the group
-        if (!contact.group.some(existingContact => existingContact.id === newContact.id)) {
-          contact.group.push(newContact);
-        }
-        contact.group.push( newContact );
-      })
+  //   if (newContact.group) {
+  //     newContact.group.forEach(contact => {
+  //       if (!contact.group) {
+  //         contact.group = [];
+  //       }
+  //       // check if the contact is already in the group
+  //       if (!contact.group.some(existingContact => existingContact.id === newContact.id)) {
+  //         contact.group.push(newContact);
+  //       }
+  //       contact.group.push( newContact );
+  //     })
 
-    }
-    this.contacts.push(newContact);
-    // this.contactListChangedEvent.next(this.contacts.slice());
-    this.storeContacts();
-  }
+  //   }
+  //   this.contacts.push(newContact);
+  //   // this.contactListChangedEvent.next(this.contacts.slice());
+  //   this.storeContacts();
+  // }
 
-  getContacts() {
-    // From Database:
-    this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json')
-      .subscribe(
-        (contacts: Contact[]) => {
-          this.contacts.length = 0;
-          this.contacts = contacts;
-          // this.contacts = this.sortContacts(contacts);
-          this.maxContactId = this.getMaxId();
-          // this.contacts.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
-          this.contacts.sort((a, b) => a.name.localeCompare(b.name));
-          this.contactListChangedEvent.next(this.contacts.slice());
-        },
-        (error: any) => {
-          console.error(error);
-        }
-      );
-  }
+  // getContacts() {
+  //   // From Database:
+  //   this.http.get('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json')
+  //     .subscribe(
+  //       (contacts: Contact[]) => {
+  //         this.contacts.length = 0;
+  //         this.contacts = contacts;
+  //         // this.contacts = this.sortContacts(contacts);
+  //         this.maxContactId = this.getMaxId();
+  //         // this.contacts.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
+  //         this.contacts.sort((a, b) => a.name.localeCompare(b.name));
+  //         this.contactListChangedEvent.next(this.contacts.slice());
+  //       },
+  //       (error: any) => {
+  //         console.error(error);
+  //       }
+  //     );
+  // }
 
-  getContact(id: string): Contact{
-    for(let contact of this.contacts){
-      if(contact.id === id){
-        return contact;
-      }
-    }
-    return null;
-  }
+  // getContact(id: string): Contact{
+  //   for(let contact of this.contacts){
+  //     if(contact.id === id){
+  //       return contact;
+  //     }
+  //   }
+  //   return null;
+  // }
 
   getEditMode(): boolean {
     return this.editMode;
@@ -93,58 +93,58 @@ export class ContactService{
     this.addMode = value;
   }
 
-  updateContact(originalContact: Contact, newContact: Contact){
-    if(!originalContact || !newContact){
-      console.error('Contact not found - update unsuccessful!');
-      alert('Contact not found - update unsuccessfull!');
-      return;
-    }
-    const pos = this.contacts.indexOf(originalContact);
-    if(pos < 0){
-      alert('Contact not found - update unsuccessfull!');
-      console.error('Contact not found - update unsuccessful!');
-      return;
-    }
+  // updateContact(originalContact: Contact, newContact: Contact){
+  //   if(!originalContact || !newContact){
+  //     console.error('Contact not found - update unsuccessful!');
+  //     alert('Contact not found - update unsuccessfull!');
+  //     return;
+  //   }
+  //   const pos = this.contacts.indexOf(originalContact);
+  //   if(pos < 0){
+  //     alert('Contact not found - update unsuccessfull!');
+  //     console.error('Contact not found - update unsuccessful!');
+  //     return;
+  //   }
 
-    // Initialize originalContact.group as an empty array if it's null or undefined
-    originalContact.group = originalContact.group || [];
-    newContact.id = originalContact.id;
-    // Assign values of the newContact to the originalContact
-    this.contacts[pos] = newContact;
+  //   // Initialize originalContact.group as an empty array if it's null or undefined
+  //   originalContact.group = originalContact.group || [];
+  //   newContact.id = originalContact.id;
+  //   // Assign values of the newContact to the originalContact
+  //   this.contacts[pos] = newContact;
 
-    // Update the contact list
-    // this.contactListChangedEvent.next(this.contacts.slice());
-    this.storeContacts();
-    return;
-  }
+  //   // Update the contact list
+  //   // this.contactListChangedEvent.next(this.contacts.slice());
+  //   this.storeContacts();
+  //   return;
+  // }
 
-  deleteContact(contact: Contact) {
-    if (!contact) {
-      alert('Contact not found - deletion unsuccessfull!');
-      console.error('Contact not found - deletion unsuccessful!');
-      return;
-    }
-    const pos = this.contacts.indexOf(contact);
-    if (pos < 0) {
-      alert('Contact not found - deletion unsuccessfull!');
-      console.error('Contact not found - deletion unsuccessful!');
-      return;
-    }
-    this.messageService.deleteMessages(contact.id);
-    this.contacts.splice(pos, 1);
-    // this.contactChangedEvent.next(this.contacts.slice());
-    this.storeContacts();
-  }
+  // deleteContact(contact: Contact) {
+  //   if (!contact) {
+  //     alert('Contact not found - deletion unsuccessfull!');
+  //     console.error('Contact not found - deletion unsuccessful!');
+  //     return;
+  //   }
+  //   const pos = this.contacts.indexOf(contact);
+  //   if (pos < 0) {
+  //     alert('Contact not found - deletion unsuccessfull!');
+  //     console.error('Contact not found - deletion unsuccessful!');
+  //     return;
+  //   }
+  //   this.messageService.deleteMessages(contact.id);
+  //   this.contacts.splice(pos, 1);
+  //   // this.contactChangedEvent.next(this.contacts.slice());
+  //   this.storeContacts();
+  // }
 
-  storeContacts() {
-    let contacts = JSON.stringify(this.contacts);
-    let headers = new HttpHeaders({'Content-Type': 'application/json'});
+  // storeContacts() {
+  //   let contacts = JSON.stringify(this.contacts);
+  //   let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    this.http.put('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json', contacts, {headers: headers})
-      .subscribe(response => {
-        this.contactListChangedEvent.next(this.contacts.slice());
-      });
-  }
+  //   this.http.put('https://wdd430-cms-5cd5d-default-rtdb.firebaseio.com/contacts.json', contacts, {headers: headers})
+  //     .subscribe(response => {
+  //       this.contactListChangedEvent.next(this.contacts.slice());
+  //     });
+  // }
 
   getMaxId(): number {
     let maxId = 0;
