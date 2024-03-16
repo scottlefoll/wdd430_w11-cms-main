@@ -114,33 +114,33 @@ router.post('/', (req, res, next) => {
 // catches and handles errors that occur while retrieving documents from
 // the database.
 
-router.put('/:id', (req, res, next) => {
-  Document.findOne({ id: req.params.id })
-    .then(document => {
-      document.name = req.body.name;
-      document.description = req.body.description;
-      document.url = req.body.url;
+// router.put('/:id', (req, res, next) => {
+//   Document.findOne({ id: req.params.id })
+//     .then(document => {
+//       document.name = req.body.name;
+//       document.description = req.body.description;
+//       document.url = req.body.url;
 
-      Document.updateOne({ id: req.params.id }, document)
-        .then(result => {
-          res.status(204).json({
-            message: 'Document updated successfully'
-          })
-        })
-        .catch(error => {
-           res.status(500).json({
-           message: 'An error occurred',
-           error: error
-         });
-        });
-    })
-    .catch(error => {
-      res.status(500).json({
-        message: 'Document not found.',
-        error: { document: 'Document not found'}
-      });
-    });
-});
+//       Document.updateOne({ id: req.params.id }, document)
+//         .then(result => {
+//           res.status(204).json({
+//             message: 'Document updated successfully'
+//           })
+//         })
+//         .catch(error => {
+//            res.status(500).json({
+//            message: 'An error occurred',
+//            error: error
+//          });
+//         });
+//     })
+//     .catch(error => {
+//       res.status(500).json({
+//         message: 'Document not found.',
+//         error: { document: 'Document not found'}
+//       });
+//     });
+// });
 
 // Method 2: this method retrieves all documents in the collection using Document.find(),
 // updates the url property of each document based on a pattern involving the document's

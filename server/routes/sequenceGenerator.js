@@ -6,20 +6,20 @@ var maxContactId;
 var sequenceId = null;
 
 function SequenceGenerator() {
-
-  Sequence.findOne()
-    .exec(function(err, sequence) {
-      if (err) {
-        return res.status(500).json({
-          title: 'An error occurred',
-          error: err
-        });
-      }
-
-      sequenceId = sequence._id;
-      maxDocumentId = sequence.maxDocumentId;
-      maxMessageId = sequence.maxMessageId;
-      maxContactId = sequence.maxContactId;
+  Sequence.find()
+    .then(result => {
+      // handle result
+      sequenceId = result._id;
+      maxDocumentId = result.maxDocumentId;
+      maxMessageId = result.maxMessageId;
+      maxContactId = result.maxContactId;
+    })
+    .catch(err => {
+      // handle error
+      return res.status(500).json({
+        title: 'An error occurred',
+        error: err
+      });
     });
 }
 

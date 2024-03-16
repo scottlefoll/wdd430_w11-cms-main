@@ -21,9 +21,8 @@ const dbURL = process.env.DATABASE_URL;
 var app = express(); // create an instance of express
 
 
-// establish a connection to the mongo database
-// { useNewUrlParser: true, useUnifiedTopology: true }, (err, res) => {
-mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true })
+// establish a connection to the mongoDb database
+mongoose.connect(dbURL)
   .then(() => {
     console.log('Connected to database!');
   })

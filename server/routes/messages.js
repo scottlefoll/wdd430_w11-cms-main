@@ -115,33 +115,33 @@ router.post('/', (req, res, next) => {
 // catches and handles errors that occur while retrieving messages from
 // the database.
 
-router.put('/:id', (req, res, next) => {
-  Message.findOne({ id: req.params.id })
-    .then(message => {
-      message.name = req.body.name;
-      message.description = req.body.description;
-      message.url = req.body.url;
+// router.put('/:id', (req, res, next) => {
+//   Message.findOne({ id: req.params.id })
+//     .then(message => {
+//       message.name = req.body.name;
+//       message.description = req.body.description;
+//       message.url = req.body.url;
 
-      Message.updateOne({ id: req.params.id }, message)
-        .then(result => {
-          res.status(204).json({
-            message: 'Message updated successfully'
-          })
-        })
-        .catch(error => {
-           res.status(500).json({
-           message: 'An error occurred',
-           error: error
-         });
-        });
-    })
-    .catch(error => {
-      res.status(500).json({
-        message: 'Message not found.',
-        error: { message: 'Message not found'}
-      });
-    });
-});
+//       Message.updateOne({ id: req.params.id }, message)
+//         .then(result => {
+//           res.status(204).json({
+//             message: 'Message updated successfully'
+//           })
+//         })
+//         .catch(error => {
+//            res.status(500).json({
+//            message: 'An error occurred',
+//            error: error
+//          });
+//         });
+//     })
+//     .catch(error => {
+//       res.status(500).json({
+//         message: 'Message not found.',
+//         error: { message: 'Message not found'}
+//       });
+//     });
+// });
 
 // Method 2: this method retrieves all messages in the collection using Message.find(),
 // updates the url property of each message based on a pattern involving the message's

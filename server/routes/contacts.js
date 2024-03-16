@@ -124,33 +124,33 @@ router.post('/', (req, res, next) => {
 // catches and handles errors that occur while retrieving contacts from
 // the database.
 
-router.put('/:id', (req, res, next) => {
-  Contact.findOne({ id: req.params.id })
-    .then(contact => {
-      contact.name = req.body.name;
-      contact.description = req.body.description;
-      contact.url = req.body.url;
+// router.put('/:id', (req, res, next) => {
+//   Contact.findOne({ id: req.params.id })
+//     .then(contact => {
+//       contact.name = req.body.name;
+//       contact.description = req.body.description;
+//       contact.url = req.body.url;
 
-      Contact.updateOne({ id: req.params.id }, contact)
-        .then(result => {
-          res.status(204).json({
-            message: 'Contact updated successfully'
-          })
-        })
-        .catch(error => {
-           res.status(500).json({
-           message: 'An error occurred',
-           error: error
-         });
-        });
-    })
-    .catch(error => {
-      res.status(500).json({
-        message: 'Contact not found.',
-        error: { contact: 'Contact not found'}
-      });
-    });
-});
+//       Contact.updateOne({ id: req.params.id }, contact)
+//         .then(result => {
+//           res.status(204).json({
+//             message: 'Contact updated successfully'
+//           })
+//         })
+//         .catch(error => {
+//            res.status(500).json({
+//            message: 'An error occurred',
+//            error: error
+//          });
+//         });
+//     })
+//     .catch(error => {
+//       res.status(500).json({
+//         message: 'Contact not found.',
+//         error: { contact: 'Contact not found'}
+//       });
+//     });
+// });
 
 // Method 2: this method retrieves all contacts in the collection using Contact.find(),
 // updates the url property of each contact based on a pattern involving the contact's
