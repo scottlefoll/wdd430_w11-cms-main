@@ -35,7 +35,8 @@ export class DocumentService{
   }
 
   getDocuments() {
-    this.http.get(`${environment.apiUrl}/documents`)
+    // this.http.get(`${environment.apiUrl}/documents`)
+    this.http.get(`${environment.localUrl}/documents`)
       .subscribe(
         (documents: Document[]) => {
           this.documents = documents;
@@ -117,7 +118,8 @@ export class DocumentService{
     let headers = new HttpHeaders({'Content-Type': 'application/json'
     });
 
-    this.http.put(`${environment.apiUrl}/documents`, documents, {headers: headers})
+    // this.http.put(`${environment.apiUrl}/documents`, documents, {headers: headers})
+    this.http.put(`${environment.localUrl}/documents`, documents, {headers: headers})
       .subscribe(response => {
         this.documentListChangedEvent.next(this.documents.slice());
       });

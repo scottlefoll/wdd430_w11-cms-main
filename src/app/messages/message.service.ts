@@ -33,7 +33,8 @@ export class MessageService{
   }
 
   getMessages() {
-    this.http.get(`${environment.apiUrl}/messages`)
+    // this.http.get(`${environment.apiUrl}/messages`)
+    this.http.get(`${environment.localUrl}/messages`)
       .subscribe(
         (messages: Message[]) => {
           this.messages = messages;
@@ -122,7 +123,8 @@ export class MessageService{
     let messages = JSON.stringify(this.messages);
     let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    this.http.put(`${environment.apiUrl}/messages`, messages, {headers: headers})
+    // this.http.put(`${environment.apiUrl}/messages`, messages, {headers: headers})
+    this.http.put(`${environment.localUrl}/messages`, messages, {headers: headers})
       .subscribe(response => {
         this.messageListChangedEvent.next(this.messages.slice());
       });

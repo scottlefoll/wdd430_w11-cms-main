@@ -51,7 +51,8 @@ export class ContactService{
   }
 
   getContacts() {
-    this.http.get(`${environment.apiUrl}/contacts`)
+    // this.http.get(`${environment.apiUrl}/contacts`)
+    this.http.get(`${environment.localUrl}/contacts`)
       .subscribe(
         (contacts: Contact[]) => {
           this.contacts.length = 0;
@@ -140,7 +141,8 @@ export class ContactService{
     let contacts = JSON.stringify(this.contacts);
     let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    this.http.put(`${environment.apiUrl}/contacts`, contacts, {headers: headers})
+    // this.http.put(`${environment.apiUrl}/contacts`, contacts, {headers: headers})
+    this.http.put(`${environment.localUrl}/contacts`, contacts, {headers: headers})
       .subscribe(response => {
         this.contactListChangedEvent.next(this.contacts.slice());
       });
