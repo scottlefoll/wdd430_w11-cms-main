@@ -23,60 +23,13 @@ const uri = process.env.DB_URL;
 var app = express(); // create an instance of express
 
 // establish a connection to the mongo database
-// mongoose.connect(uri,
-//    { useNewUrlParser: true }, (err, res) => {
-//       if (err) {
-//          console.log('Connection failed: ' + err);
-//       }
-//       else {
-//          console.log('Connected to database!');
-
-//          // Fetch all contacts from the database
-//           Contact.find({}, (err, contacts) => {
-//             if (err) {
-//               console.error('Error fetching contacts:', err);
-//             } else {
-//               console.log('Contacts retrieved from the database:', contacts);
-//             }
-//           });
-//       }
-//    }
-// );
-
-// const dbConn = mongoose.connection;
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
-    // Fetch all contacts from the database
-    Contact.find({}, (err, contacts) => {
-      if (err) {
-        console.error('Error fetching contacts:', err);
-      } else {
-        console.log('Contacts retrieved from the database:', contacts);
-      }
-    });
-
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
+mongoose.connect(uri)
+  .then(() =>
+    console.log('Connected to database!')
+  )
+  .catch(err =>
+    console.log('Connection failed:', err)
+  );
 
 // Must be the first middleware loaded in order to log results from other middleware
 app.use(logger('dev')); // Tell express to use the Morgan logger
