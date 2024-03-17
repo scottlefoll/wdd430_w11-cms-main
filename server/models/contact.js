@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Contact = require('./server/models/contact');
 
 const contactSchema = mongoose.Schema({
    id: { type: String, required: true },
