@@ -66,6 +66,27 @@ app.use('/messages', messageRoutes);
 app.use('/contacts', contactRoutes);
 app.use('/documents', documentRoutes);
 
+// Alternative to the below catch-all route, you can use the following middleware
+// Purpose: This middleware attempts to render a view named index.
+// This implies that your server is set up to use a template engine
+// (e.g., EJS, Pug) to generate HTML dynamically.
+
+// Behavior: Without additional configuration specifying where and
+// how to find the index view, this middleware might not function
+// as intended, especially in an Angular application context where
+// index.html is a static file, not a template to be rendered server-side.
+
+// Usage: More common in server-rendered applications where the
+// server dynamically generates HTML content based on templates.
+// It's not typically used in SPA scenarios where static files are
+// served as the entry point to the application:
+// app.use((req, res, next) => {
+//   res.render('index');
+// });
+
+//  Tell express to map all other non-defined routes back to the index page
+// This way the front-end routing library can handle the route
+// This should be after your API and routes setup to catch any unhandled routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/cms/browser/index.html'));
 });
