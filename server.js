@@ -62,9 +62,10 @@ app.use(express.static(path.join(__dirname, 'dist/cms/browser')));
 // Set up the API route
 // tell express to map the default route ('/') to the index route
 app.use('/', index);
-app.use('/messages', messageRoutes);
-app.use('/contacts', contactRoutes);
-app.use('/documents', documentRoutes);
+app.use('/api/', index);
+app.use('/api/messages', messageRoutes);
+app.use('/api/contacts', contactRoutes);
+app.use('/api/documents', documentRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/cms/browser/index.html'));
