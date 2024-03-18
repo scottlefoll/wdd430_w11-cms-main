@@ -2,12 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.json",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "dist/cms/browser/**",
-      "use": "@vercel/static"
+      "src": "src/app",
+      "use": "@vercel/node",
+      "config": {
+        "runtime": "nodejs12.x"
+      }
     }
   ],
   "routes": [
