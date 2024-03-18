@@ -36,6 +36,7 @@ export class MessageEditComponent {
     // Call the addMessageEvent.emit() method and pass the new Message object as an argument.
     this.addMessageEvent.emit(message);
     this.messageService.addMessage(message);
+    this.onClear();
 }
 
   onClear() {

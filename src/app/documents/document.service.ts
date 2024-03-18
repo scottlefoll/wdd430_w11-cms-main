@@ -31,7 +31,7 @@ export class DocumentService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // add to database
-    this.http.post<{message: string, document: Document}>(`${environment.apiUrl}/documents`, document, {headers: headers})
+    this.http.post<{message: string, document: Document}>(`${environment.localUrl}/documents`, document, {headers: headers})
       .subscribe(
         (responseData) => {
           // add new contact to to local contacts array
@@ -42,7 +42,7 @@ export class DocumentService{
   }
 
   getDocuments() {
-    this.http.get<{documents: Document[]}>(`${environment.apiUrl}/documents`)
+    this.http.get<{documents: Document[]}>(`${environment.localUrl}/documents`)
       .subscribe(
         (response) => {
           this.documents = [...response.documents];
@@ -99,7 +99,7 @@ export class DocumentService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // update database
-    this.http.put(`${environment.apiUrl}/documents/${originalDocument.id}`, updatedDocument, {headers: headers})
+    this.http.put(`${environment.localUrl}/documents/${originalDocument.id}`, updatedDocument, {headers: headers})
       .subscribe(
         (response) => {
           this.documents[pos] = updatedDocument;
