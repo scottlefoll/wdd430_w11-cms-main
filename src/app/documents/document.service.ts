@@ -18,32 +18,36 @@ export class DocumentService{
   maxDocumentId: number;
   documents: Document[] = [];
 
-  // Inject the HttpClient object into the DocumentService class through dependency injection.
-  // The HttpClient object will be used to send HTTP requests to the server.
   constructor(private http: HttpClient) {}
 
-  addDocument(newDocument: Document) {
-    if (!newDocument) {
+  addDocument(document: Document){
+    if(!document){
       return;
     }
 
-    this.maxDocumentId++;
-    newDocument.id = this.maxDocumentId.toString();
-    this.documents.push(newDocument);
-    // this.documentListChangedEvent.next(this.documents.slice());
-    this.storeDocuments();
+    document.id = '';
+    this.maxDocumentId = this.getMaxId();
+    document.id = String(this.maxDocumentId + 1);
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // add to database
+    this.http.post<{message: string, document: Document}>(`${environment.localUrl}/documents`, document, {headers: headers})
+      .subscribe(
+        (responseData) => {
+          // add new contact to to local contacts array
+          this.documents.push(responseData.document);
+          this.sortAndSend();
+        }
+      );
   }
 
   getDocuments() {
-    // this.http.get(`${environment.apiUrl}/documents`)
-    this.http.get(`${environment.localUrl}/documents`)
+    this.http.get<{documents: Document[]}>(`${environment.localUrl}/documents`)
       .subscribe(
-        (documents: Document[]) => {
-          this.documents = documents;
+        (response) => {
+          this.documents = [...response.documents];
           this.maxDocumentId = this.getMaxId();
-          // this.documents.sort((a, b) => (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0);
-          this.documents.sort((a, b) => a.name.localeCompare(b.name));
-          this.documentListChangedEvent.next(this.documents.slice());
+          this.sortAndSend();
         },
         (error: any) => {
           console.error(error);
@@ -76,24 +80,32 @@ export class DocumentService{
     this.addMode = value;
   }
 
-  updateDocument(originalDocument: Document, newDocument: Document){
-    if(!originalDocument || !newDocument){
-      console.error('Document not found - update unsuccessful!');
-      alert('Document not found - update unsuccessfull!');
-      return of(null); // return observable
-    }
-    const foundDocument = this.documents.find(doc => doc.id === originalDocument.id);
-
-    if (!foundDocument) {
-      console.error('Document not found - update unsuccessful!');
-      alert('Document not found - update unsuccessfull!');
-      return of(null);
+  updateDocument(originalDocument: Document, updatedDocument: Document) {
+    if (!originalDocument || !updatedDocument) {
+      console.error('Message not found - update unsuccessful!');
+      alert('Message not found - update unsuccessfull!');
+      return;
     }
 
-    Object.assign(foundDocument, newDocument);
-    // this.documentListChangedEvent.next(this.documents.slice());
-    this.storeDocuments();
-    return of(foundDocument);
+    const pos = this.documents.findIndex(d => d.id === originalDocument.id);
+
+    if (pos < 0) {
+      console.error('Document not found - update unsuccessful!');
+      alert('Document not found - update unsuccessfull!');
+      return;
+    }
+
+    updatedDocument.id = originalDocument.id;
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // update database
+    this.http.put(`${environment.localUrl}/documents/${originalDocument.id}`, updatedDocument, {headers: headers})
+      .subscribe(
+        (response) => {
+          this.documents[pos] = updatedDocument;
+          this.sortAndSend();
+        }
+      );
   }
 
   deleteDocument(document: Document) {
@@ -109,20 +121,12 @@ export class DocumentService{
       return;
     }
     this.documents.splice(pos, 1);
-    // this.documentChangedEvent.next(this.documents.slice());
-    this.storeDocuments();
+    this.sortAndSend();
   }
 
-  storeDocuments() {
-    let documents = JSON.stringify(this.documents);
-    let headers = new HttpHeaders({'Content-Type': 'application/json'
-    });
-
-    // this.http.put(`${environment.apiUrl}/documents`, documents, {headers: headers})
-    this.http.put(`${environment.localUrl}/documents`, documents, {headers: headers})
-      .subscribe(response => {
-        this.documentListChangedEvent.next(this.documents.slice());
-      });
+  sortAndSend() {
+    this.documents.sort((a, b) => a.name.localeCompare(b.name));
+    this.documentListChangedEvent.next(this.documents.slice());
   }
 
   getMaxId(): number {

@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { Message } from '../message.model';
 import { MessageItemComponent } from '../message-item/message-item.component';
 import { MessageService } from '../message.service';
+import { ContactService } from '../../contacts/contact.service';
 
 // declare a message property to store the form values
 message: Message;
@@ -20,11 +21,13 @@ export class MessageListComponent implements OnInit {
   subscription: Subscription;
 
   constructor(private messageService: MessageService,
+              private contactService: ContactService,
               private router: Router,
               private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.messageService.getMessages();
+    this.contactService.getContacts();
     this.messageService.messageChangedEvent
       .subscribe(
       (messages: Message[]) => {

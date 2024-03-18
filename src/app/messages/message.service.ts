@@ -20,27 +20,39 @@ export class MessageService{
 
   constructor(private http: HttpClient) {}
 
-  addMessage(newMessage: Message) {
-    if (!newMessage) {
+  addMessage(updatedMessage: Message) {
+    if (!updatedMessage) {
       return;
     }
 
-    this.maxMessageId++;
-    newMessage.id = this.maxMessageId.toString();
-    this.messages.push(newMessage);
-    // this.messageListChangedEvent.next(this.messages.slice());
-    this.storeMessages();
+    updatedMessage.id = '';
+    this.maxMessageId = this.getMaxId();
+    updatedMessage.id = String(this.maxMessageId + 1);
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // add to database
+    this.http.post<{message: string, updatedMessage: Message}>(`${environment.localUrl}/messages`, updatedMessage, {headers: headers})
+      .subscribe(
+        (responseData) => {
+          // add new contact to to local contacts array
+          this.messages.push(responseData.updatedMessage);
+          this.sortAndSend();
+        }
+      );
   }
 
   getMessages() {
-    // this.http.get(`${environment.apiUrl}/messages`)
-    this.http.get(`${environment.localUrl}/messages`)
+    this.http.get<{messages: Message[]}>(`${environment.localUrl}/messages`)
       .subscribe(
-        (messages: Message[]) => {
-          this.messages = messages;
+        (response) => {
+          this.messages = [...response.messages];
           this.maxMessageId = this.getMaxId();
-          this.messages.sort((a, b) => a.id.localeCompare(b.id));
-          this.messageListChangedEvent.next(this.messages.slice());
+          console.log("getMessages: ", this.messages);
+          // Log each message and its sender
+          this.messages.forEach(message => {
+            console.log("Message:", message, "Sender:", message.sender);
+          });
+          this.sortAndSend();
         },
         (error: any) => {
           console.error(error);
@@ -72,62 +84,73 @@ export class MessageService{
     this.addMode = value;
   }
 
-  updateMessage(originalMessage: Message, newMessage: Message){
-    if(!originalMessage || !newMessage){
+  updateMessage(originalMessage: Message, updatedMessage: Message){
+    if(!originalMessage || !updatedMessage){
       console.error('Message not found - update unsuccessful!');
       alert('Message not found - update unsuccessfull!');
-      return of(null); // return observable
+      return;
     }
-    const foundMessage = this.messages.find(doc => doc.id === originalMessage.id);
 
-    if (!foundMessage) {
+    // const foundMessage = this.messages.find(doc => doc.id === originalMessage.id);
+    const pos = this.messages.findIndex(d => d.id === originalMessage.id);
+
+    if (pos < 0) {
       console.error('Message not found - update unsuccessful!');
       alert('Message not found - update unsuccessfull!');
-      return of(null);
+      return;
     }
 
-    Object.assign(foundMessage, newMessage);
-    // this.messageListChangedEvent.next(this.messages.slice());
-    this.storeMessages();
-    return of(foundMessage);
+    // set the id of the new Document to the id of the old Document
+    updatedMessage.id = originalMessage.id;
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // update database
+    this.http.put(`${environment.localUrl}/messages/${originalMessage.id}`, updatedMessage, {headers: headers})
+      .subscribe(
+        (response) => {
+          this.messages[pos] = updatedMessage;
+          this.sortAndSend();
+        }
+      );
   }
 
   deleteMessage(message: Message) {
     if (!message) {
-      console.error('Message not found - update unsuccessful!');
+      console.error('Message not found - deletion unsuccessful!');
       alert('Message not found - deletion unsuccessfull!');
       return;
     }
     const pos = this.messages.indexOf(message);
     if (pos < 0) {
-      console.error('Message not found - update unsuccessful!');
+      console.error('Message not found - deletion unsuccessful!');
       alert('Message not found - deletion unsuccessfull!');
       return;
     }
-    this.messages.splice(pos, 1);
-    // this.messageChangedEvent.next(this.messages.slice());
-    this.storeMessages();
+
+    // delete from database
+    this.http.delete(`${environment.localUrl}/contacts/${message.id}`)
+      .subscribe(
+        (response) => {
+          this.messages.splice(pos, 1);
+          this.sortAndSend();
+        }
+      );
   }
 
   deleteMessages(senderId: string) {
     for (let i = this.messages.length - 1; i >= 0; i--) {
       if (this.messages[i].sender === senderId) {
+        // delete from database
+        this.http.delete(`${environment.localUrl}/contacts/${this.messages[i].id}`)
         this.messages.splice(i, 1);
       }
+        this.sortAndSend();
     }
-    // this.messageChangedEvent.next(this.messages.slice());
-    this.storeMessages();
   }
 
-  storeMessages() {
-    let messages = JSON.stringify(this.messages);
-    let headers = new HttpHeaders({'Content-Type': 'application/json'});
-
-    // this.http.put(`${environment.apiUrl}/messages`, messages, {headers: headers})
-    this.http.put(`${environment.localUrl}/messages`, messages, {headers: headers})
-      .subscribe(response => {
-        this.messageListChangedEvent.next(this.messages.slice());
-      });
+  sortAndSend() {
+    this.messages.sort((a, b) => a.id.localeCompare(b.id));
+    this.messageListChangedEvent.next(this.messages.slice());
   }
 
   getMaxId(): number {

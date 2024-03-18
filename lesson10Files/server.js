@@ -9,7 +9,7 @@ var logger = require('morgan');
 // import the routing file to handle the default (index) route
 var index = require('./server/routes/app');
 
-// ... ADD CODE TO IMPORT YOUR ROUTING FILES HERE ... 
+// ... ADD CODE TO IMPORT YOUR ROUTING FILES HERE ...
 
 var app = express(); // create an instance of express
 
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 
 // Tell express to use the specified director as the
 // root directory for your web site
-app.use(express.static(path.join(__dirname, 'dist/cms')));
+app.use(express.static(path.join(__dirname, 'dist/browser/cms')));
 
 // Tell express to map the default route ('/') to the index route
 app.use('/', index);
@@ -47,7 +47,7 @@ app.use('/', index);
 
 // Tell express to map all other non-defined routes back to the index page
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/cms/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/cms/browser/index.html'));
 });
 
 // Define the port address and tell express to use this port

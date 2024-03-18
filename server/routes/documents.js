@@ -1,10 +1,9 @@
-const sequenceGenerator = require('./sequenceGenerator');
-const Document = require('../models/document');
 var express = require('express');
 var router = express.Router();
-module.exports = router;
 
-// Method 1: Async Promise
+const sequenceGenerator = require('./sequenceGenerator');
+const Document = require('../models/document');
+
 router.get('/', (req, res, next) => {
   console.log('GET /documents');
   Document.find()
@@ -26,10 +25,11 @@ router.post('/', (req, res, next) => {
   const maxDocumentId = sequenceGenerator.nextId("documents");
 
   const document = new Document({
-    id: maxDocumentId,
+    id: req.body.id,
     name: req.body.name,
     description: req.body.description,
-    url: req.body.url
+    url: req.body.url,
+    children: req.body.children
   });
 
   document.save()
@@ -48,13 +48,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.put('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    description: req.body.description,
-    url: req.body.url,
-  };
-
-  Document.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Document.findOneAndUpdate({ id: req.params.id }, req.body, { new: true })
     .then(updatedDocument => {
       if (!updatedDocument) {
         return res.status(404).json({
@@ -95,13 +89,8 @@ router.delete('/:id', (req, res, next) => {
 });
 
 router.patch('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    url: req.body.url,
-    children: req.body.children,
-  };
 
-  Document.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Document.findOneAndUpdate({ id: req.params.id }, req.body, { new: true, useFindAndModify: false })
     .then(updatedDocument => {
       if (!updatedDocument) {
         return res.status(404).json({

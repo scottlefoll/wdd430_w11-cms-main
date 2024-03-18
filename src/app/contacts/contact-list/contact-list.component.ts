@@ -23,7 +23,7 @@ export class ContactListComponent implements OnInit {
               private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.contactService.getContacts();
+    this.contactService.getContacts(true);
     this.contactService.contactChangedEvent
       .subscribe(
         (contacts: Contact[]) => {

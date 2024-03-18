@@ -3,9 +3,6 @@ var router = express.Router();
 
 const sequenceGenerator = require('./sequenceGenerator');
 const Contact = require('../models/contact');
-var express = require('express');
-var router = express.Router();
-module.exports = router;
 
 router.get('/', (req, res, next) => {
   console.log('get contacts');
@@ -29,10 +26,12 @@ router.post('/', (req, res, next) => {
   const maxContactId = sequenceGenerator.nextId("contacts");
 
   const contact = new Contact({
-    id: maxContactId,
+    id: req.body.id,
     name: req.body.name,
-    description: req.body.description,
-    url: req.body.url
+    email: req.body.email,
+    phone: req.body.phone,
+    imageUrl: req.body.imageUrl,
+    group: req.body.group
   });
 
   contact.save()
@@ -52,13 +51,7 @@ router.post('/', (req, res, next) => {
 
 
 router.put('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    description: req.body.description,
-    url: req.body.url,
-  };
-
-  Contact.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Contact.findOneAndUpdate({ id: req.params.id }, req.body, { new: true })
     .then(updatedContact => {
       if (!updatedContact) {
         return res.status(404).json({
@@ -99,13 +92,8 @@ router.delete('/:id', (req, res, next) => {
 });
 
 router.patch('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    url: req.body.url,
-    children: req.body.children,
-  };
 
-  Contact.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Contact.findOneAndUpdate({ id: req.params.id }, req.body, { new: true, useFindAndModify: false })
     .then(updatedContact => {
       if (!updatedContact) {
         return res.status(404).json({
@@ -125,7 +113,6 @@ router.patch('/:id', (req, res, next) => {
       });
     });
 });
-
 
 module.exports = router;
 

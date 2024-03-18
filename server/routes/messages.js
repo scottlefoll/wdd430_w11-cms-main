@@ -3,10 +3,7 @@ var router = express.Router();
 
 const sequenceGenerator = require('./sequenceGenerator');
 const Message = require('../models/message');
-var express = require('express');
-var router = express.Router();
 
-// Method 1: Async Promise
 router.get('/', (req, res, next) => {
   console.log('get messages');
   Message.find()
@@ -50,13 +47,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.put('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    description: req.body.description,
-    url: req.body.url,
-  };
-
-  Message.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Message.findOneAndUpdate({ id: req.params.id }, req.body, { new: true })
     .then(updatedMessage => {
       if (!updatedMessage) {
         return res.status(404).json({
@@ -97,13 +88,7 @@ router.delete('/:id', (req, res, next) => {
 });
 
 router.patch('/:id', (req, res, next) => {
-  const update = {
-    name: req.body.name,
-    url: req.body.url,
-    children: req.body.children,
-  };
-
-  Message.findOneAndUpdate({ id: req.params.id }, update, { new: true, useFindAndModify: false })
+  Message.findOneAndUpdate({ id: req.params.id }, req.body, { new: true, useFindAndModify: false })
     .then(updatedMessage => {
       if (!updatedMessage) {
         return res.status(404).json({
