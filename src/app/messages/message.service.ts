@@ -31,7 +31,7 @@ export class MessageService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // add to database
-    this.http.post<{message: string, updatedMessage: Message}>(`${environment.localUrl}/messages`, updatedMessage, {headers: headers})
+    this.http.post<{message: string, updatedMessage: Message}>(`${environment.api2Url}/messages`, updatedMessage, {headers: headers})
       .subscribe(
         (responseData) => {
           // add new contact to to local contacts array
@@ -42,7 +42,7 @@ export class MessageService{
   }
 
   getMessages() {
-    this.http.get<{messages: Message[]}>(`${environment.localUrl}/messages`)
+    this.http.get<{messages: Message[]}>(`${environment.api2Url}/messages`)
       .subscribe(
         (response) => {
           this.messages = [...response.messages];
@@ -100,7 +100,7 @@ export class MessageService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // update database
-    this.http.put(`${environment.localUrl}/messages/${originalMessage.id}`, updatedMessage, {headers: headers})
+    this.http.put(`${environment.api2Url}/messages/${originalMessage.id}`, updatedMessage, {headers: headers})
       .subscribe(
         (response) => {
           this.messages[pos] = updatedMessage;
@@ -123,7 +123,7 @@ export class MessageService{
     }
 
     // delete from database
-    this.http.delete(`${environment.localUrl}/messsages/${message.id}`)
+    this.http.delete(`${environment.api2Url}/messsages/${message.id}`)
       .subscribe(
         (response) => {
           this.messages.splice(pos, 1);
@@ -141,7 +141,7 @@ export class MessageService{
       .filter(message => message.sender === senderId)
       .map(message => {
         console.log(`Preparing to delete message with ID: ${message.id} from sender: ${senderId}`);
-        return this.http.delete(`${environment.localUrl}/messages/${message.id}`).pipe(
+        return this.http.delete(`${environment.api2Url}/messages/${message.id}`).pipe(
           catchError(error => {
             console.error('Error deleting message with ID:', message.id, error);
             return of(null); // Handle error but allow other requests to continue
