@@ -25,10 +25,10 @@ router.post('/', (req, res, next) => {
   const maxMessageId = sequenceGenerator.nextId("messages");
 
   const message = new Message({
-    id: maxMessageId,
-    name: req.body.name,
-    description: req.body.description,
-    url: req.body.url
+    id: req.body.id,
+    subject: req.body.subject,
+    msgText: req.body.msgText,
+    sender: req.body.sender
   });
 
   message.save()

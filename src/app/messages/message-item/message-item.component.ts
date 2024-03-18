@@ -16,7 +16,6 @@ export class MessageItemComponent {
 
   ngOnInit() {
     this.senderName = this.contactService.getName(this.message.sender);
-    console.log("Message Sender " + this.message.sender + " : " + this.senderName);
   }
 
 }

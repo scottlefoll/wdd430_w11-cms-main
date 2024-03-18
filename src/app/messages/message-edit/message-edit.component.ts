@@ -17,7 +17,7 @@ export class MessageEditComponent {
   @ViewChild('msgText') msgText: ElementRef;
 
   // Create a string variable named currentSender and initialize it with the value of your name.
-  currentSender: string = '19';
+  currentSender: string = '101';
   cdRef: any;
 
   constructor(private messageService: MessageService) { }

@@ -88,7 +88,6 @@ export class ContactService{
     }
     for(let contact of this.contacts){
       if(contact.id === id){
-        console.log('Contact id:name: ' + contact.name + ' : ' + contact.id);
         return contact.name;
       }
     }

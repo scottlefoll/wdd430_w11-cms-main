@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from "@angular/core";
-import { Subject, of } from "rxjs";
+import { Subject, of, forkJoin } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { catchError } from 'rxjs/operators';
 
 import { Message } from "./message.model";
 import { environment } from '../../environments/environment';
@@ -25,7 +26,6 @@ export class MessageService{
       return;
     }
 
-    updatedMessage.id = '';
     this.maxMessageId = this.getMaxId();
     updatedMessage.id = String(this.maxMessageId + 1);
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
@@ -35,7 +35,7 @@ export class MessageService{
       .subscribe(
         (responseData) => {
           // add new contact to to local contacts array
-          this.messages.push(responseData.updatedMessage);
+          this.messages.push(updatedMessage);
           this.sortAndSend();
         }
       );
@@ -47,11 +47,6 @@ export class MessageService{
         (response) => {
           this.messages = [...response.messages];
           this.maxMessageId = this.getMaxId();
-          console.log("getMessages: ", this.messages);
-          // Log each message and its sender
-          this.messages.forEach(message => {
-            console.log("Message:", message, "Sender:", message.sender);
-          });
           this.sortAndSend();
         },
         (error: any) => {
@@ -128,7 +123,7 @@ export class MessageService{
     }
 
     // delete from database
-    this.http.delete(`${environment.localUrl}/contacts/${message.id}`)
+    this.http.delete(`${environment.localUrl}/messsages/${message.id}`)
       .subscribe(
         (response) => {
           this.messages.splice(pos, 1);
@@ -138,14 +133,36 @@ export class MessageService{
   }
 
   deleteMessages(senderId: string) {
-    for (let i = this.messages.length - 1; i >= 0; i--) {
-      if (this.messages[i].sender === senderId) {
-        // delete from database
-        this.http.delete(`${environment.localUrl}/contacts/${this.messages[i].id}`)
-        this.messages.splice(i, 1);
-      }
-        this.sortAndSend();
-    }
+    console.log("Deleting messages from sender: ", senderId);
+    console.log("Initial messages list:", this.messages);
+
+    // Collect observables for all delete requests
+    const deleteRequests = this.messages
+      .filter(message => message.sender === senderId)
+      .map(message => {
+        console.log(`Preparing to delete message with ID: ${message.id} from sender: ${senderId}`);
+        return this.http.delete(`${environment.localUrl}/messages/${message.id}`).pipe(
+          catchError(error => {
+            console.error('Error deleting message with ID:', message.id, error);
+            return of(null); // Handle error but allow other requests to continue
+          })
+        );
+      });
+
+    // Execute all delete requests and wait for them to complete
+    forkJoin(deleteRequests).subscribe(results => {
+      console.log("Delete requests completed. Results:", results);
+
+      // Calculate and log which messages were supposed to be deleted
+      const messagesToDelete = this.messages.filter(message => message.sender === senderId).map(m => m.id);
+      console.log("Messages IDs expected to delete:", messagesToDelete);
+
+      // Filter out successfully deleted messages from the local state
+      this.messages = this.messages.filter(message => message.sender !== senderId);
+
+      console.log("Updated messages list after deletion:", this.messages);
+      this.sortAndSend();
+    });
   }
 
   sortAndSend() {
