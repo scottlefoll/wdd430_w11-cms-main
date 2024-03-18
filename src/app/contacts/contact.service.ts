@@ -38,7 +38,7 @@ export class ContactService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // add to database
-    this.http.post<{message: string, contact: Contact}>(`${environment.localUrl}/contacts`, contact, {headers: headers})
+    this.http.post<{message: string, contact: Contact}>(`${environment.apiUrl}/contacts`, contact, {headers: headers})
       .subscribe(
         (responseData) => {
           // this.getContacts(); // Fetch the updated contacts list from the server
@@ -51,7 +51,7 @@ export class ContactService{
 
   getContacts(forceReload: boolean = false) {
     if (!this.contactsLoaded || forceReload) {
-      this.http.get<{contacts: Contact[]}>(`${environment.localUrl}/contacts`)
+      this.http.get<{contacts: Contact[]}>(`${environment.apiUrl}/contacts`)
         .subscribe(
           (response) => {
             this.contacts.length = 0;
@@ -131,7 +131,7 @@ export class ContactService{
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
     // Update the database
-    this.http.put(`${environment.localUrl}/contacts/${originalContact.id}`, updatedContact, {headers: headers})
+    this.http.put(`${environment.apiUrl}/contacts/${originalContact.id}`, updatedContact, {headers: headers})
       .subscribe(
         (response) => {
           // this.getContacts(); // Fetch the updated contacts list from the server
@@ -156,7 +156,7 @@ export class ContactService{
     this.messageService.deleteMessages(contact.id);
 
     // delete from database
-    this.http.delete(`${environment.localUrl}/contacts/${contact.id}`)
+    this.http.delete(`${environment.apiUrl}/contacts/${contact.id}`)
       .subscribe(
         (response) => {
           // this.getContacts(); // Fetch the updated contacts list from the server
